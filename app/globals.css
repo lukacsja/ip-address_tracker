@@ -3,6 +3,6 @@
 @tailwind utilities;
 
 :root {
-  --grey-dark: hsl(0, 0%, 17%);
+  --gray-dark: hsl(0, 0%, 17%);
   --gray-medium: hsl(0, 0%, 59%);
 }
