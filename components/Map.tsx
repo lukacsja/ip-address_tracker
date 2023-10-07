@@ -5,72 +5,84 @@ import MarkerIcon from '../node_modules/leaflet/dist/images/marker-icon.png';
 import MarkerShadow from '../node_modules/leaflet/dist/images/marker-shadow.png';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import Details from './Details';
+import { geoData } from '@/lib/types';
 
 const Map = () => {
-  const [coord, setCoord] = useState<LatLngExpression>([51.505, -0.09]);
+  const [geoData, setgeoData] = useState<geoData | null>(null);
+  const [coords, setCoords] = useState<LatLngExpression | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const SearchLocation = () => {
-    return (
-      <div className='search-location'>
-        <input type='text' placeholder='Search Location' />
-      </div>
-    );
-  };
-
-  const GetMyLocation = () => {
-    const getMyLocation = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          setCoord([position.coords.latitude, position.coords.longitude]);
+  useEffect(() => {
+    const fetchgeoData = async () => {
+      try {
+        const response = await fetch('/api/getGeoData', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(geoData),
         });
-      } else {
-        console.log('Geolocation is not supported by this browser.');
+
+        if (response.ok) {
+          const data = await response.json();
+          setgeoData(data);
+          setIsLoading(false);
+
+          if (data.location) {
+            const lat = data.location.lat;
+            const lng = data.location.lng;
+            setCoords([lat, lng]);
+          }
+        } else {
+          throw new Error('Failed to fetch visitor information');
+        }
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
       }
     };
 
-    return (
-      <div className='get-my-location'>
-        <button onClick={getMyLocation}>Get My Location</button>
-      </div>
-    );
-  };
+    fetchgeoData();
+  }, []);
 
   return (
-    <div>
-      <SearchLocation />
-      <GetMyLocation />
-      <MapContainer
-        className='h-[400px] w-full'
-        center={coord}
-        zoom={13}
-        scrollWheelZoom={true}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-        />
+    <>
+      <div className='h-full'>
+        {isLoading ? (
+          <p>LOADING</p>
+        ) : (
+          <MapContainer
+            className='h-full w-full'
+            center={coords || [12.12, 12.12]}
+            zoom={13}
+            scrollWheelZoom={true}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+            />
 
-        <Marker
-          icon={
-            new L.Icon({
-              iconUrl: MarkerIcon.src,
-              iconRetinaUrl: MarkerIcon.src,
-              iconSize: [25, 41],
-              iconAnchor: [12.5, 41],
-              popupAnchor: [0, -41],
-              shadowUrl: MarkerShadow.src,
-              shadowSize: [41, 41],
-            })
-          }
-          position={[51.505, -0.09]}
-        >
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker>
-      </MapContainer>
-    </div>
+            <Marker
+              icon={
+                new L.Icon({
+                  iconUrl: '/icons/marker-icon.svg',
+                  iconSize: [46, 56],
+                  popupAnchor: [0, -40],
+                  shadowUrl: MarkerShadow.src,
+                  shadowSize: [50, 50],
+                })
+              }
+              position={coords || [12.12, 12.12]}
+            >
+              <Popup>Your approximate position.</Popup>
+            </Marker>
+          </MapContainer>
+        )}
+      </div>
+      {!isLoading && <Details geoData={geoData || null} />}
+    </>
   );
 };
 

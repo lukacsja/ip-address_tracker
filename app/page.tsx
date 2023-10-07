@@ -1,5 +1,6 @@
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import Header from '@/components/Header';
+import SearchBox from '@/components/SearchBox';
 
 const DynamicMap = dynamic(() => import('../components/Map'), {
   ssr: false,
@@ -7,16 +8,10 @@ const DynamicMap = dynamic(() => import('../components/Map'), {
 
 export default function Home() {
   return (
-    <main className='flex flex-col'>
-      <div>
-        <Image
-          src='/images/pattern-bg-desktop.png'
-          alt='blue pattern background image'
-          width={1440}
-          height={280}
-        />
-      </div>
+    <main className='relative flex h-screen flex-col'>
+      <Header />
       <DynamicMap />
+      <SearchBox />
     </main>
   );
 }

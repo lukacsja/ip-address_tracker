@@ -3,6 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --gray-dark: hsl(0, 0%, 17%);
-  --gray-medium: hsl(0, 0%, 59%);
+  --color-gray-dark: #2c2c2c;
+  --color-gray-light: #979797;
+  --color-gray-medium: #3f3f3f;
 }
+
+/* .header-bg {
+  background-image: url(../public/images/pattern-bg-mobile.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+@media (min-width: 375px) {
+  .header-bg {
+    background-image: url(../public/images/pattern-bg-desktop.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+  }
+} */
